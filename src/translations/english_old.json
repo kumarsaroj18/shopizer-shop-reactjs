@@ -156,19 +156,5 @@
   "Your rating": "Your rating",
   "Message": "Message",
   "Submit": "Submit",
-  "No items found in reviews": "No items found in reviews",
-  "Addresses": "Addresses",
-  "Billing Addresses": "Billing Addresses",
-  "Delivery Addresses": "Delivery Addresses",
-  "Add New Address": "Add New Address",
-  "Edit Address": "Edit Address",
-  "Save Address": "Save Address",
-  "Saving...": "Saving...",
-  "Cancel": "Cancel",
-  "Edit": "Edit",
-  "Delete": "Delete",
-  "No addresses found": "No addresses found",
-  "Are you sure?": "Are you sure?",
-  "Yes, delete it!": "Yes, delete it!",
-  "Are you sure you want to delete this address?": "Are you sure you want to delete this address?"
+  "No items found in reviews": "No items found in reviews"
 }

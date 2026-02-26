@@ -14,7 +14,6 @@
 		"node-fetch": "2.6.1",
 		"prop-types": "^15.7.2",
 		"react": "^16.6.0",
-		"react-dom": "^16.6.0",
 		"react-app-polyfill": "^1.0.4",
 		"react-bootstrap": "1.0.1",
 		"react-bootstrap-sweetalert": "^5.2.0",
@@ -23,6 +22,7 @@
 		"react-countdown-now": "^2.1.2",
 		"react-countup": "^4.2.3",
 		"react-custom-scrollbars-2": "^4.4.0",
+		"react-dom": "^16.6.0",
 		"react-fullpage": "^0.1.19",
 		"react-geocode": "^0.2.2",
 		"react-hook-form": "^6.13.1",
@@ -78,6 +78,6 @@
 	},
 	"devDependencies": {
 		"redux-devtools-extension": "^2.13.8",
-		"sass": "^1.29.0"
+		"sass": "^1.32.13"
 	}
 }
