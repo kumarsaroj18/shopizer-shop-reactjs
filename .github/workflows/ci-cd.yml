@@ -30,7 +30,7 @@ jobs:
         CI: true
     
     - name: Upload test coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-coverage-${{ github.run_number }}
         path: coverage/
@@ -71,7 +71,7 @@ jobs:
         echo "}" >> build/metadata/build-info.json
     
     - name: Archive build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: shopizer-react-build-${{ github.run_number }}
         path: build/
@@ -82,21 +82,46 @@ jobs:
         tar -czf shopizer-react-${{ github.run_number }}.tar.gz -C build .
     
     - name: Upload release package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: shopizer-react-release-${{ github.run_number }}
         path: shopizer-react-${{ github.run_number }}.tar.gz
         retention-days: 90
 
+  store-artifacts:
+    name: Store Build Artifacts
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: shopizer-react-build-${{ github.run_number }}
+        path: build/
+    
+    - name: Upload to artifact storage
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-ready-build-${{ github.run_number }}
+        path: build/
+        retention-days: 90
+
   docker:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs: build
+    needs: store-artifacts
     if: github.event_name == 'push'
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: deployment-ready-build-${{ github.run_number }}
+        path: build/
     
     - name: Build Docker image
       run: |
@@ -108,7 +133,7 @@ jobs:
         docker save shopizer-shop-reactjs:${{ github.run_number }} | gzip > shopizer-react-docker-${{ github.run_number }}.tar.gz
     
     - name: Upload Docker image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: shopizer-react-docker-${{ github.run_number }}
         path: shopizer-react-docker-${{ github.run_number }}.tar.gz
