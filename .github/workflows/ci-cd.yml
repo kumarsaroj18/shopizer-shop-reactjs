@@ -106,35 +106,3 @@ jobs:
         name: deployment-ready-build-${{ github.run_number }}
         path: build/
         retention-days: 90
-
-  docker:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: store-artifacts
-    if: github.event_name == 'push'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: deployment-ready-build-${{ github.run_number }}
-        path: build/
-    
-    - name: Build Docker image
-      run: |
-        docker build -t shopizer-shop-reactjs:${{ github.run_number }} .
-        docker tag shopizer-shop-reactjs:${{ github.run_number }} shopizer-shop-reactjs:latest
-    
-    - name: Save Docker image
-      run: |
-        docker save shopizer-shop-reactjs:${{ github.run_number }} | gzip > shopizer-react-docker-${{ github.run_number }}.tar.gz
-    
-    - name: Upload Docker image
-      uses: actions/upload-artifact@v4
-      with:
-        name: shopizer-react-docker-${{ github.run_number }}
-        path: shopizer-react-docker-${{ github.run_number }}.tar.gz
-        retention-days: 30
