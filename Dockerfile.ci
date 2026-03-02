@@ -1,0 +1,32 @@
+# Dockerfile for CI artifact-based image
+# The React build directory is downloaded from GitHub Actions by build-image-from-ci.sh
+# before this Dockerfile is invoked. Do not run this directly.
+#
+# Usage: ./build-image-from-ci.sh <github-owner> <repo> [branch] [image-tag]
+
+FROM nginx:stable-alpine
+
+# Remove the default nginx config
+RUN rm -rf /etc/nginx/conf.d
+
+# build/ is extracted locally by build-image-from-ci.sh into .ci-download/shopizer-react/build/
+COPY .ci-download/shopizer-react/build/ /usr/share/nginx/html/
+
+# nginx config: SPA routing + gzip
+COPY conf /etc/nginx
+
+# Runtime env injection: env.sh reads shell env vars and regenerates env-config.js
+COPY env.sh /usr/share/nginx/html/env.sh
+COPY .env   /usr/share/nginx/html/.env
+
+# Add bash (required by env.sh) and make the script executable
+RUN apk add --no-cache bash \
+ && chmod +x /usr/share/nginx/html/env.sh
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO/dev/null http://localhost/ || exit 1
+
+# Regenerate env-config.js from runtime env vars, then start nginx
+CMD ["/bin/sh", "-c", "cd /usr/share/nginx/html && ./env.sh && exec nginx -g 'daemon off;'"]

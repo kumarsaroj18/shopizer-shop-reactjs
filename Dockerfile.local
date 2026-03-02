@@ -1,0 +1,34 @@
+# Dockerfile for local development build
+# Prerequisites: Build the React project first from this directory:
+#   npm ci --legacy-peer-deps
+#   npm run build
+#
+# Then build this image:
+#   docker build -f Dockerfile.local -t shopizer-shop-reactjs:local .
+
+FROM nginx:stable-alpine
+
+# Remove the default nginx config
+RUN rm -rf /etc/nginx/conf.d
+
+# build/ is produced locally by: npm run build
+COPY build/ /usr/share/nginx/html/
+
+# nginx config: SPA routing + gzip
+COPY conf /etc/nginx
+
+# Runtime env injection: env.sh reads shell env vars and regenerates env-config.js
+COPY env.sh /usr/share/nginx/html/env.sh
+COPY .env   /usr/share/nginx/html/.env
+
+# Add bash (required by env.sh) and make the script executable
+RUN apk add --no-cache bash \
+ && chmod +x /usr/share/nginx/html/env.sh
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO/dev/null http://localhost/ || exit 1
+
+# Regenerate env-config.js from runtime env vars, then start nginx
+CMD ["/bin/sh", "-c", "cd /usr/share/nginx/html && ./env.sh && exec nginx -g 'daemon off;'"]
